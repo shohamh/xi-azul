@@ -1,13 +1,13 @@
 extern crate azul;
 
-use editor::*;
+use editor;
 use azul::prelude::*;
 use azul::widgets::text_input::*;
 
 #[derive(Debug)]
 struct EditorModel {
     text_input: TextInputState,
-    selections: Vec<Selection>
+    selections: Vec<editor::Selection>
 }
 
 impl Default for EditorModel {

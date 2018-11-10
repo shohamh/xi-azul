@@ -1,6 +1,4 @@
-mod Selection {
-    type Selection = {
-        start: usize,
-        end: usize,
-    };
-}
+/*type Selection = {
+    start: usize,
+    end: usize,
+};*/
