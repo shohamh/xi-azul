@@ -1,5 +1,5 @@
 #[derive(Debug)]
-struct Selection {
+pub struct Selection {
     start: usize,
     end: usize,
 }
