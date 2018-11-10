@@ -1,30 +1,35 @@
-extern crate azul;
-
+use crate::editor::selection::Selection;
 use azul::prelude::*;
 use azul::widgets::text_input::*;
 
-struct AppState {
+#[derive(Debug)]
+struct EditorModel {
     text_input: TextInputState,
+    selections: Vec<Selection>
 }
 
-impl Default for AppState {
+impl Default for EditorModel {
     fn default() -> Self {
-        AppState { text_input: TextInputState::new("Hello, world!") }
+        EditorModel { text_input: TextInputState::new("Hello, world!") }
     }
 }
 
-impl Layout for AppState {
+impl Layout for EditorModel {
     fn layout(&self, info: WindowInfo<Self>) -> Dom<Self> {
         TextInput::new()
             .bind(info.window, &self.text_input, &self)
             .dom(&self.text_input)
+            .with_callback(On::MouseDown, Callback(text_mouse_down))
     }
 }
 
-fn main() {
-    println!("Hello, world!");
+fn text_mouse_down(state: &mut AppState<EditorModel>, event: WindowEvent<EditorModel>) -> UpdateScreen {
+    println!("event: {:#?}", event);
+    UpdateScreen::Redraw
+}
 
-    let app = App::new(AppState::default(), AppConfig::default());
+fn main() {
+    let app = App::new(EditorModel::default(), AppConfig::default());
     app.run(
         Window::new(WindowCreateOptions::default(), Css::native()).unwrap(),
     ).unwrap();
