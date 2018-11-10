@@ -1,5 +1,3 @@
-extern crate azul;
-
 mod editor;
 use azul::prelude::*;
 use azul::widgets::text_input::*;
