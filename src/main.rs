@@ -1,4 +1,3 @@
-use crate::editor::selection::Selection;
 use azul::prelude::*;
 use azul::widgets::text_input::*;
 
