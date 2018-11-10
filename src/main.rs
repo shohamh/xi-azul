@@ -1,3 +1,5 @@
+extern crate azul;
+
 use azul::prelude::*;
 use azul::widgets::text_input::*;
 
