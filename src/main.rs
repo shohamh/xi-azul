@@ -12,7 +12,7 @@ struct EditorModel {
 
 impl Default for EditorModel {
     fn default() -> Self {
-        EditorModel { text_input: TextInputState::new("Hello, world!") }
+        EditorModel { text_input: TextInputState::new("Hello, world!"), selections: Vec::new() }
     }
 }
 
