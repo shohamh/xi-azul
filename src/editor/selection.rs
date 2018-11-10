@@ -1,4 +1,4 @@
-type Selection = {
+/*type Selection = {
     start: usize,
     end: usize,
-};
+};*/
