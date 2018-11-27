@@ -5,4 +5,8 @@ authors = ["shohamh <shohamh@hotmail.com>"]
 edition = "2018"
 
 [dependencies]
-azul = { git = "https://github.com/maps4print/azul" }
+azul = { path = "azul" }
+xrl = { path = "xrl" }
+futures = "0.1.23"
+tokio = "0.1.7"
+
