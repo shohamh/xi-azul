@@ -39,10 +39,10 @@ impl Frontend for XiFrontend {
         // note that we could send requests/notifications to the core here with `self.client`
         self.line_cache.update(update);
         self.ui_model.text_input.text = self.line_cache.lines()
-                                                       .iter()
-                                                       .map(|line| line.clone().text)
-                                                       .collect::<Vec<String>>()
-                                                       .join("");
+            .iter()
+            .map(|line| line.clone().text)
+            .collect::<Vec<String>>()
+            .join("");
         Box::new(future::ok(()))
     }
     fn scroll_to(&mut self, scroll_to: ScrollTo) -> ServerResult<()> {
@@ -87,7 +87,7 @@ impl FrontendBuilder<XiFrontend> for XiFrontendBuilder {
         XiFrontend {
             client: client,
             ui_model: EditorUIModel::default(),
-            line_cache: LineCache::new()
+            line_cache: LineCache::new(),
         }
     }
 }
