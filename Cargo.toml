@@ -9,4 +9,3 @@ azul = { path = "azul" }
 xrl = { path = "xrl" }
 futures = "0.1.23"
 tokio = "0.1.7"
-actix = "0.7.7"

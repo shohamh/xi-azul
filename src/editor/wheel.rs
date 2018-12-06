@@ -1,5 +1,4 @@
 use azul::prelude::*;
-use azul::widgets::button::*;
 use azul::widgets::svg::*;
 
 const WHEEL_SVG: &str = include_str!("wheel.svg");
