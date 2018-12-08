@@ -1,25 +1,28 @@
 use std::string::String;
+
+use azul::prelude::*;
 use azul::text_layout::*;
 use azul::widgets::text_input::*;
-use azul::prelude::*;
-use crate::editor::selection::Selection;
-use futures::sync::mpsc::UnboundedReceiver;
-use super::UIMessage;
-use futures::stream::Stream;
-use futures::future::ok;
+use crossbeam::channel::Receiver;
 use futures::future::Future;
-use futures::Async;
+use futures::future::ok;
+use futures::stream::Stream;
+use tokio::runtime::current_thread::TaskExecutor;
+
+use crate::editor::selection::Selection;
+
+use super::UIMessage;
 
 #[derive(Debug)]
 pub struct EditorUIModel {
-    pub message_queue: UnboundedReceiver<UIMessage>,
+    pub message_queue: Receiver<UIMessage>,
     pub text_input: TextInputState,
     pub selections: Vec<Selection>,
 }
 
 
 impl EditorUIModel {
-    pub fn new(message_queue: UnboundedReceiver<UIMessage>) -> Self {
+    pub fn new(message_queue: Receiver<UIMessage>) -> Self {
         EditorUIModel {
             text_input: TextInputState::default(),
             selections: vec![],
@@ -41,20 +44,19 @@ impl Layout for EditorUIModel {
 }
 
 fn xi_client_daemon(state: &mut EditorUIModel, _app_resources: &mut AppResources) -> (UpdateScreen, TerminateDaemon) {
-    match state.message_queue.by_ref().collect().poll() {
-        Ok(Async::Ready(ui_messages)) => {
-            for ui_message in ui_messages {
+    loop {
+        match state.message_queue.try_recv() {
+            Ok(ui_message) =>
                 match ui_message {
                     UIMessage::Update(update_data) => {
                         state.text_input.text = format!("{:?}", update_data.operations);
                     }
-                };
-            };
-            (UpdateScreen::DontRedraw, TerminateDaemon::Continue)
-        },
-        Ok(Async::NotReady) => (UpdateScreen::DontRedraw, TerminateDaemon::Continue),
-        Err(e) => (UpdateScreen::DontRedraw, TerminateDaemon::Terminate)
+                },
+            Err(err) => break
+        }
     }
+
+    (UpdateScreen::Redraw, TerminateDaemon::Continue)
 }
 
 fn text_mouse_down(

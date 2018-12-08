@@ -1,14 +1,15 @@
+use crossbeam::channel::Receiver;
+use futures::future::Future;
+use xrl::Client;
+use xrl::LineCache;
+
+pub use ui_message::UIMessage;
+use ui_model::EditorUIModel;
+
 mod selection;
 mod wheel;
 mod ui_model;
 mod ui_message;
-
-use ui_model::EditorUIModel;
-use futures::future::Future;
-use futures::sync::mpsc::*;
-use xrl::LineCache;
-use xrl::Client;
-pub use ui_message::UIMessage;
 
 #[derive(Debug)]
 pub struct Editor {
@@ -18,7 +19,7 @@ pub struct Editor {
 }
 
 impl Editor {
-    pub fn new(client: Client, message_queue: UnboundedReceiver<UIMessage>) -> Editor {
+    pub fn new(client: Client, message_queue: Receiver<UIMessage>) -> Editor {
         Editor {
             ui_model: ui_model::EditorUIModel::new(message_queue),
             xi_client: client,

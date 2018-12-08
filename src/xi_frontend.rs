@@ -1,16 +1,17 @@
-use xrl::{LineCache, Client, Frontend, FrontendBuilder, ServerResult, Update, ScrollTo, Style,
-          AvailablePlugins, UpdateCmds, PluginStarted, PluginStoped, ConfigChanged, ThemeChanged,
-          spawn};
-use futures::{future, Future, Stream, sync::mpsc::{UnboundedSender, UnboundedReceiver}};
+use crossbeam::channel::{Receiver, Sender, unbounded};
+use futures::{future, Future, Stream};
+use futures::sink::Sink;
+use xrl::{AvailablePlugins, Client, ConfigChanged, Frontend, FrontendBuilder, LineCache, PluginStarted, PluginStoped,
+          ScrollTo, ServerResult, spawn, Style, ThemeChanged, Update,
+          UpdateCmds};
+
 use crate::editor::Editor;
 use crate::editor::UIMessage;
-use futures::sync::mpsc::unbounded;
-use futures::sink::Sink;
 
-pub struct XiClientServiceBuilder(UnboundedSender<UIMessage>);
+pub struct XiClientServiceBuilder(Sender<UIMessage>);
 
 impl XiClientServiceBuilder {
-    pub fn new() -> (Self, UnboundedReceiver<UIMessage>) {
+    pub fn new() -> (Self, Receiver<UIMessage>) {
         let (tx, rx) = unbounded();
         (XiClientServiceBuilder(tx), rx)
     }
@@ -25,20 +26,14 @@ impl FrontendBuilder<XiClientService> for XiClientServiceBuilder {
 
 
 pub struct XiClientService {
-    message_queue_sink: UnboundedSender<UIMessage>,
+    message_queue_sink: Sender<UIMessage>,
     client: Client,
 }
 
 impl XiClientService {
     fn pass_message_to_ui(&mut self, ui_message: UIMessage) -> ServerResult<()> {
-        match self.message_queue_sink.start_send(ui_message) {
-            Ok(_) => match self.message_queue_sink.poll_complete() {
-                Ok(_) => Box::new(future::ok(())),
-                Err(e) => {
-                    let e = format!("Failed to send core event to UI: {}", e);
-                    Box::new(future::err(e.into()))
-                }
-            },
+        match self.message_queue_sink.send(ui_message) {
+            Ok(_) => Box::new(future::ok(())),
             Err(e) => {
                 let e = format!("Failed to send core event to UI: {}", e);
                 Box::new(future::err(e.into()))
